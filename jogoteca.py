@@ -9,6 +9,23 @@ app = Flask(__name__)
 app.secret_key = "atilio"
 
 
+# Criando uma classe usuário para apenas quem tiver cadastro fazer o login
+class Usuario:
+    def __init__(self, id, nome, senha):
+        self.id = id
+        self.nome = nome
+        self.senha = senha
+
+
+# Criando usuarios para login e senha
+user_1 = Usuario('atiliog', 'Atilio', '123321')
+user_2 = Usuario('mixto', 'Thiago', 'rje10')
+user_3 = Usuario('cris', 'Cristiano', 'jaera')
+
+# minha chave é a id do usuário, e o valor é o próprio objeto usuário
+usuarios = {user_1.id: user_1, user_2.id: user_2, user_3.id: user_3}
+
+
 # Criando uma classe para os jogos
 class Jogo:
     def __init__(self, nome, categoria, console):
@@ -110,30 +127,43 @@ def login():
 # "/login"
 @app.route('/autenticar', methods=['POST', ])
 def autenticar():
-    # busca e verifica se a senha do usuário é igual a "mestra" recuperando o
-    # valor na variável name="usuario" em
-    # <p><label>Senha:</label> <input class="form-control" type="password" name="senha" required></p>
-    if request.form['senha'] == "mestra":
 
-        # o session permite passar informações entre requisições, uma vez que as
-        # requisições são statless (não guardam informações entre requisições)
-        # o session é um dicionário que guarda chave e valor e passa entre as
-        # requisições, neste caso session['usuario_logado'] = request.form['usuario']
-        # que está em "/login" na variável name="usuario" em
-        # <p><label>Nome de usuário:</label> <input class="form-control" type="text" name="usuario" required></p>
-        session['usuario_logado'] = request.form['usuario']
+    # ######################### TRECHO PARA MULTIPLOS USUARIOS ################
+    # Verificando se o usuário está dentro da lista de objetos usuarios cadastrados
+    if request.form['usuario'] in usuarios:
+        usuario = usuarios[request.form['usuario']]
+        if usuario.senha == request.form['senha']:
+            session['usuario_logado'] = usuario.id
+            flash(usuario.nome + " logado com sucesso.")
+            proxima_pagina = request.form['proxima']
+            return redirect(proxima_pagina)
 
-        # A função flash mostra uma mensagem rápida que será usada para informar
-        # o estado do login, se feito ou não.
-        flash(request.form['usuario'] + " logado com sucesso.")
+    # ######################## TRECHO PARA 1 UNICO USUARIO ####################
+    # # busca e verifica se a senha do usuário é igual a "mestra" recuperando o
+    # # valor na variável name="usuario" em
+    # # <p><label>Senha:</label> <input class="form-control" type="password" name="senha" required></p>
+    # if request.form['senha'] == "mestra":
 
-        # aqui vamos recuperar a informação passada adiante sobre qual é a próxima
-        # página vinda da rota '/novo'
-        proxima_pagina = request.form['proxima']
+    #     # o session permite passar informações entre requisições, uma vez que as
+    #     # requisições são statless (não guardam informações entre requisições)
+    #     # o session é um dicionário que guarda chave e valor e passa entre as
+    #     # requisições, neste caso session['usuario_logado'] = request.form['usuario']
+    #     # que está em "/login" na variável name="usuario" em
+    #     # <p><label>Nome de usuário:</label> <input class="form-control" type="text" name="usuario" required></p>
+    #     session['usuario_logado'] = request.form['usuario']
 
-        # usando o url_for e só passar direto o proxima_pagina neste caso
-        # return redirect('/{}'.format(proxima_pagina))
-        return redirect(proxima_pagina)
+    #     # A função flash mostra uma mensagem rápida que será usada para informar
+    #     # o estado do login, se feito ou não.
+    #     flash(request.form['usuario'] + " logado com sucesso.")
+
+    #     # aqui vamos recuperar a informação passada adiante sobre qual é a próxima
+    #     # página vinda da rota '/novo'
+    #     proxima_pagina = request.form['proxima']
+
+    #     # usando o url_for e só passar direto o proxima_pagina neste caso
+    #     # return redirect('/{}'.format(proxima_pagina))
+    #     return redirect(proxima_pagina)
+    ###########################################################################
     else:
         flash("Login não efetuado.")
         return redirect(url_for('login'))
