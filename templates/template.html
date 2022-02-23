@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Jogoteca</title>
+    <!-- Vamos mudar o sistema de referencia estático para dinâmico do link -->
+    <!-- <link rel="stylesheet" href="../static/bootstrap.css"> -->
+    <!-- Inserindo o sistema dinêmico de link usando a função url_for e passando a pasta static e o arquivo a ser lido em filename -->
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'bootstrap.css') }}">
+</head>
+<body>
+    <div class="container">
+    <!-- Aqui vamos inserir o trecho de código que permite o FLASH mostrar a mensagem -->
+    <!-- Esse código não é tão simples por isso é copiado direto da doc do flask -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %} 
+            <ul id="messages" class="list-unstyled">
+            {% for message in messages %}
+                <li class="alert alert-success">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+      <div class="page-header">
+            <h1>{{ titulo }}</h1>
+      </div>
+      <!--Aqui colocamos o trecho de outros blocos que tem nome "conteudo" -->
+      {% block conteudo %}{% endblock %}
+    </div>
+</body>
+</html>
